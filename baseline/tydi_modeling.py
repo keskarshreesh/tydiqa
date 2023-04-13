@@ -25,8 +25,6 @@ from bert import optimization as bert_optimization
 import tensorflow.compat.v1 as tf
 import data
 
-import tensorflow.contrib as tf_contrib
-
 
 def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
                  use_one_hot_embeddings):
@@ -69,7 +67,7 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
 
   # Get the logits for the answer type prediction.
   answer_type_output_layer = model.get_pooled_output()
-  answer_type_hidden_size = answer_type_output_layer.shape[-1].value
+  answer_type_hidden_size = answer_type_output_layer.shape[-1]
 
   num_answer_types = 5  # YES, NO, UNKNOWN, PASSAGE, MINIMAL
   answer_type_output_weights = tf.get_variable(
@@ -178,7 +176,7 @@ def model_fn_builder(bert_config, init_checkpoint, learning_rate,
                                                     num_train_steps,
                                                     num_warmup_steps, use_tpu)
 
-      output_spec = tf_contrib.tpu.TPUEstimatorSpec(
+      output_spec = tf.estimator.tpu.TPUEstimatorSpec(
           mode=mode,
           loss=total_loss,
           train_op=train_op,
@@ -190,7 +188,7 @@ def model_fn_builder(bert_config, init_checkpoint, learning_rate,
           "end_logits": end_logits,
           "answer_type_logits": answer_type_logits,
       }
-      output_spec = tf_contrib.tpu.TPUEstimatorSpec(
+      output_spec = tf.estimator.tpu.TPUEstimatorSpec(
           mode=mode, predictions=predictions, scaffold_fn=scaffold_fn)
     else:
       raise ValueError("Only TRAIN and PREDICT modes are supported: %s" %
